@@ -42,13 +42,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean update(User user) {
-        return userRepository.save(user).equals(user) ;
+    public void update(User user) {
+        userRepository.saveAndFlush(user) ;
     }
 
     @Override
-    public boolean delete(String login) {
+    public void delete(String login) {
         userRepository.deleteById(login);
-        return true;
     }
 }

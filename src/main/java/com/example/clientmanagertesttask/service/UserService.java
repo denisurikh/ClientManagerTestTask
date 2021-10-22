@@ -11,7 +11,7 @@ public interface UserService {
 
     User read(String login);
 
-    boolean update(User user);
+    void update(User user);
 
-    boolean delete(String login);
+    void delete(String login);
 }

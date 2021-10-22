@@ -3,7 +3,7 @@ package com.example.clientmanagertesttask.response;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UsersResponse {
+public class StatusJsonResponse {
     private boolean success = true;
     private final Set<String> errors= new HashSet<>();
 

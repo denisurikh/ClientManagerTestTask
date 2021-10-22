@@ -9,20 +9,20 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "USERS")
+@Table(name = "users")
 
 public class User {
 
     @Id
-    @Column(name = "LOGIN", nullable = false, unique = true, length = 70)
+    @Column(name = "login", nullable = false, unique = true, length = 70)
     private String login;
-    @Column(name = "NAME", length = 70)
+    @Column(name = "name", length = 70)
     private String name;
-    @Column(name = "PASSWORD", length = 70)
+    @Column(name = "password", length = 70)
     private String password;
-    @JoinTable(name = "USER_ROLE_LINK",
-            joinColumns = @JoinColumn(name = "USER_LOGIN"),
-            inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
+    @JoinTable(name = "user_role_link",
+            joinColumns = @JoinColumn(name = "user_role"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Fetch(value = FetchMode.JOIN)
     private Set<Role> roles;

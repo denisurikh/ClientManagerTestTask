@@ -2,7 +2,7 @@ package com.example.clientmanagertesttask.controllers;
 
 import com.example.clientmanagertesttask.dto.UserDTO;
 import com.example.clientmanagertesttask.model.User;
-import com.example.clientmanagertesttask.response.UsersResponse;
+import com.example.clientmanagertesttask.response.StatusJsonResponse;
 import com.example.clientmanagertesttask.service.PasswordValidator;
 import com.example.clientmanagertesttask.service.UserService;
 import com.example.clientmanagertesttask.utils.Mapping;
@@ -20,6 +20,7 @@ public class UserController {
     private final UserService userService;
     MessageSource messageSource;
 
+
     @Autowired
     public UserController(UserService userService, MessageSource messageSource) {
         this.userService = userService;
@@ -27,8 +28,30 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
-    public ResponseEntity<?> create(@RequestBody UserDTO userDTO) {
-        UsersResponse response = new UsersResponse();
+        public ResponseEntity<?> create(@RequestBody UserDTO userDTO) {
+        return getResponseEntity(userDTO);
+    }
+
+    @GetMapping(value = "/users")
+    public ResponseEntity<List<UserDTO>> read() {
+        final List<User> userList = userService.readAll();
+        final List<UserDTO> userDtoList = userList.stream().map(Mapping::mapUserToUserDtoWithoutRoles).collect(Collectors.toList());
+        return new ResponseEntity<>(userDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/users/{login}")
+    public ResponseEntity<?> read(@PathVariable(name = "login") String login) {
+            User user = userService.read(login);
+            return new ResponseEntity<>(Mapping.mapUserToUserDto(user), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/users/")
+    public ResponseEntity<?> update(@RequestBody UserDTO userDTO) {
+        return getResponseEntity(userDTO);
+    }
+
+    private ResponseEntity<?> getResponseEntity(@RequestBody UserDTO userDTO) {
+        StatusJsonResponse response = new StatusJsonResponse();
 
         if (userDTO.getName().isBlank()) {
             response.addError(getMessage("user.name.nonempty"));
@@ -54,43 +77,14 @@ public class UserController {
                 response.addError(getMessage("db.access.error"));
             }
         }
-
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/users")
-    public ResponseEntity<List<UserDTO>> read() {
-        final List<User> userList = userService.readAll();
-        final List<UserDTO> userDtoList = userList.stream().map(Mapping::mapUserToUserDtoWithoutRoles).collect(Collectors.toList());
-        return new ResponseEntity<>(userDtoList, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/users/{login}")
-    public ResponseEntity<UserDTO> read(@PathVariable(name = "login") String login) {
-        final User user = userService.read(login);
-
-        return user != null
-                ? new ResponseEntity<>(Mapping.mapUserToUserDto(user), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PutMapping(value = "/users/")
-    public ResponseEntity<?> update(@RequestBody UserDTO userDto) {
-
-        final boolean updated = userService.update(Mapping.mapUserDtoToUser(userDto));
-
-        return updated
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
     @DeleteMapping(value = "/users/{login}")
     public ResponseEntity<?> delete(@PathVariable(name = "login") String login) {
-        final boolean deleted = userService.delete(login);
+        userService.delete(login);
 
-        return deleted
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private String getMessage(String code) {

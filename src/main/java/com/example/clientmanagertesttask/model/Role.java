@@ -7,14 +7,14 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "ROLES")
+@Table(name = "roles")
 public class Role {
     @EqualsAndHashCode.Exclude
-    @Column(name = "ID")
+    @Column(name = "id")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "ROLE_NAME", nullable = false, unique = true, length = 70)
+    @Column(name = "role_name", nullable = false, unique = true, length = 70)
 
     private String roleName;
 
